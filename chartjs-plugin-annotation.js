@@ -686,6 +686,9 @@ module.exports = function(Chart) {
       model.x = xScale.getPixelForValue(options.xValue);
       model.y = yScale.getPixelForValue(options.yValue);
       model.radius = options.radius;
+      model.borderWidth = options.borderWidth;
+      model.fillColor = options.fillColor;
+      model.borderColor = options.borderColor;
     },
     draw: function() {
       var model = this._model;
@@ -693,13 +696,16 @@ module.exports = function(Chart) {
       var centerX = model.x;
       var centerY = model.y;
       var radius = model.radius;
+      var borderWidth = model.borderWidth;
+      var fillColor = model.fillColor;
+      var borderColor = model.borderColor;
 
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = 'green';
+      ctx.fillStyle = fillColor;
       ctx.fill();
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = '#003300';
+      ctx.lineWidth = borderWidth;
+      ctx.strokeStyle = borderColor;
       ctx.stroke();
 
       ctx.save();
