@@ -1,14 +1,9 @@
-
+{
   "name": "chartjs-plugin-annotation",
   "homepage": "https://github.com/osro/chartjs-plugin-annotation",
   "version": "0.5.3",
   "_release": "0.5.3",
   "main": "./chartjs-plugin-annotation.js",
-  "_resolution": {
-    "type": "version",
-    "tag": "v0.5.3",
-    "commit": "71ffc51b2aacb4b7f5bd7b47880979e2c5becd0c"
-  },
   "_source": "https://github.com/osro/chartjs-plugin-annotation",
   "_target": "^0.5.3",
   "_originalSource": "chartjs-plugin-annotation",
