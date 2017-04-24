@@ -513,7 +513,7 @@ Chart.pluginService.register(annotationPlugin);
 // Box Annotation implementation
 module.exports = function(Chart) {
 	var helpers = require('../helpers.js')(Chart);
-	
+
 	var BoxAnnotation = Chart.Annotation.Element.extend({
 		setDataLimits: function() {
 			var model = this._model;
@@ -571,9 +571,9 @@ module.exports = function(Chart) {
 				y2: chartArea.bottom
 			};
 
-			var left = chartArea.left, 
-				top = chartArea.top, 
-				right = chartArea.right, 
+			var left = chartArea.left,
+				top = chartArea.top,
+				right = chartArea.right,
 				bottom = chartArea.bottom;
 
 			var min, max;
@@ -606,9 +606,9 @@ module.exports = function(Chart) {
 		inRange: function(mouseX, mouseY) {
 			var model = this._model;
 			return model &&
-				mouseX >= model.left && 
-				mouseX <= model.right && 
-				mouseY >= model.top && 
+				mouseX >= model.left &&
+				mouseX <= model.right &&
+				mouseY >= model.top &&
 				mouseY <= model.bottom;
 		},
 		getCenterPoint: function() {
@@ -679,9 +679,15 @@ module.exports = function(Chart) {
       var model = this._model;
       var options = this.options;
       var chartInstance = this.chartInstance;
+      var chartArea = chartInstance.chartArea;
 
       var xScale = chartInstance.scales[options.xScaleID];
       var yScale = chartInstance.scales[options.yScaleID];
+
+      var left = chartArea.left,
+        top = chartArea.top,
+        right = chartArea.right,
+        bottom = chartArea.bottom;
 
       model.x = xScale.getPixelForValue(options.xValue);
       model.y = yScale.getPixelForValue(options.yValue);
@@ -689,6 +695,22 @@ module.exports = function(Chart) {
       model.borderWidth = options.borderWidth;
       model.fillColor = options.fillColor;
       model.borderColor = options.borderColor;
+    },
+    inRange: function(mouseX, mouseY) {
+      var model = this._model;
+      var result = this.pointInCircle(mouseX, mouseY, model.x, model.y, model.radius);
+      return result;
+    },
+    pointInCircle: function(x, y, cx, cy, radius) {
+      var distancesquared = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+      return distancesquared <= radius * radius;
+    },
+    getCenterPoint: function() {
+      var model = this._model;
+      return {
+        x: model.x,
+        y: model.y
+      };
     },
     draw: function() {
       var model = this._model;
