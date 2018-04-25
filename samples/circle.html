@@ -50,7 +50,7 @@
       var options = {
         annotation: {
           drawTime: "afterDraw",
-          events: ['dblclick'],
+          events: ['dblclick', 'mouseover'],
           annotations: [{
             type: 'circle',
             xValue: 'May',
@@ -63,6 +63,12 @@
             fillColor: 'yellow',
             onDblclick: function(e) {
                 console.log('Circle yellow', e.type, this);
+            },
+            onMouseover: function(e) {
+                console.log('Circle gray', e.type, this);
+            },
+            onMouseout: function(e) {
+                console.log('Circle gray', e.type, this);
             }
           },{
             type: 'circle',
@@ -75,6 +81,12 @@
             borderColor: '#992032',
             fillColor: '#888888',
             onDblclick: function(e) {
+                console.log('Circle gray', e.type, this);
+            },
+            onMouseover: function(e) {
+                console.log('Circle gray', e.type, this);
+            },
+            onMouseout: function(e) {
                 console.log('Circle gray', e.type, this);
             }
           },{
@@ -89,6 +101,12 @@
             fillColor: 'blue',
             onDblclick: function(e) {
                 console.log('Circle blue', e.type, this);
+            },
+            onMouseover: function(e) {
+                console.log('Circle gray', e.type, this);
+            },
+            onMouseout: function(e) {
+                console.log('Circle gray', e.type, this);
             }
           }]
         }
