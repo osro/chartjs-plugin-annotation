@@ -678,7 +678,6 @@ module.exports = function(Chart) {
       model.ranges = {};
     },
     configure: function() {
-      debugger;
       var model = this._model;
       var options = this.options;
       var chartInstance = this.chartInstance;
