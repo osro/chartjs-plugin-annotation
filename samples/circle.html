@@ -7,11 +7,7 @@
   <script src="../node_modules/chart.js/dist/Chart.bundle.js"></script>
   <script src="../chartjs-plugin-annotation.js"></script>
   <style>
-    canvas {
-      -moz-user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-    }
+
   </style>
 </head>
 
@@ -20,6 +16,8 @@
     <div>
       <canvas id="canvas"></canvas>
     </div>
+
+    <button onclick="updateChart()">Update chart</button>
     <script>
       var data = {
         labels: ["January", "February", "March", "April", "May", "June", "July"],
@@ -50,7 +48,7 @@
       var options = {
         annotation: {
           drawTime: "afterDraw",
-          events: ['dblclick', 'mouseover'],
+          events: ['dblclick', 'mouseover','mouseout'],
           annotations: [{
             type: 'circle',
             xValue: 'May',
@@ -65,10 +63,10 @@
                 console.log('Circle yellow', e.type, this);
             },
             onMouseover: function(e) {
-                console.log('Circle gray', e.type, this);
+                console.log('Circle yellow', e.type, this);
             },
             onMouseout: function(e) {
-                console.log('Circle gray', e.type, this);
+                console.log('Circle yellow', e.type, this);
             }
           },{
             type: 'circle',
@@ -103,14 +101,20 @@
                 console.log('Circle blue', e.type, this);
             },
             onMouseover: function(e) {
-                console.log('Circle gray', e.type, this);
+                console.log('Circle blue', e.type, this);
             },
             onMouseout: function(e) {
-                console.log('Circle gray', e.type, this);
+                console.log('Circle blue', e.type, this);
             }
           }]
         }
       };
+
+      function updateChart() {
+        var last = window.circleChart.options.annotation.annotations[3];
+        last.fillColor = '#222222';
+        window.circleChart.update();
+      }
 
       window.onload = function() {
         var ctx = document.getElementById("canvas").getContext("2d");
@@ -119,6 +123,31 @@
           data: data,
           options: options
         });
+
+        // debugger;
+
+        window.circleChart.options.annotation.annotations.push({
+          type: 'circle',
+          xValue: 'April',
+          yValue: 70,
+          xScaleID: 'x-axis-0',
+          yScaleID: 'y-axis-0',
+          radius: 20,
+          borderWidth: 2,
+          borderColor: '#992032',
+          fillColor: '#992032',
+          onDblclick: function(e) {
+              console.log('Circle red', e.type, this);
+          },
+          onMouseover: function(e) {
+              console.log('Circle red', e.type, this);
+          },
+          onMouseout: function(e) {
+              console.log('Circle red', e.type, this);
+          }
+        });
+
+        window.circleChart.update();
       };
     </script>
   </div>
