@@ -1,4 +1,4 @@
-/*!
+/*@preserve!
  * chartjs-plugin-annotation.js
  * http://chartjs.org/
  * Version: 0.5.7
@@ -11,10 +11,12 @@
 
 },{}],2:[function(require,module,exports){
 module.exports = function(Chart) {
+	/* eslint-disable global-require */
 	var chartHelpers = Chart.helpers;
 
 	var helpers = require('./helpers.js')(Chart);
 	var events = require('./events.js')(Chart);
+	/* eslint-enable global-require */
 
 	var annotationTypes = Chart.Annotation.types;
 
@@ -36,19 +38,27 @@ module.exports = function(Chart) {
 					return drawTime === (element.options.drawTime || defaultDrawTime);
 				})
 				.forEach(function(element) {
+					element.configure();
 					element.transition(easingDecimal).draw();
 				});
 		};
 	}
 
+	function getAnnotationConfig(chartOptions) {
+		var plugins = chartOptions.plugins;
+		var pluginAnnotation = plugins && plugins.annotation ? plugins.annotation : null;
+		return pluginAnnotation || chartOptions.annotation || {};
+	}
+
 	return {
+		id: 'annotation',
 		beforeInit: function(chartInstance) {
 			var chartOptions = chartInstance.options;
 
 			// Initialize chart instance plugin namespace
 			var ns = chartInstance.annotation = {
 				elements: {},
-				options: helpers.initConfig(chartOptions.annotation || {}),
+				options: helpers.initConfig(getAnnotationConfig(chartOptions)),
 				onDestroy: [],
 				firstRun: true,
 				supported: false
@@ -70,7 +80,7 @@ module.exports = function(Chart) {
 			}
 
 			if (!ns.firstRun) {
-				ns.options = helpers.initConfig(chartInstance.options.annotation || {});
+				ns.options = helpers.initConfig(getAnnotationConfig(chartInstance.options));
 			} else {
 				ns.firstRun = false;
 			}
@@ -108,11 +118,6 @@ module.exports = function(Chart) {
 				}
 			});
 		},
-		afterScaleUpdate: function(chartInstance) {
-			helpers.elements(chartInstance).forEach(function(element) {
-				element.configure();
-			});
-		},
 		beforeDatasetsDraw: draw('beforeDatasetsDraw'),
 		afterDatasetsDraw: draw('afterDatasetsDraw'),
 		afterDraw: draw('afterDraw'),
@@ -131,6 +136,9 @@ module.exports = function(Chart) {
 			}
 		},
 		destroy: function(chartInstance) {
+			if (!chartInstance || !chartInstance.annotation) {
+				return;
+			}
 			var deregisterers = chartInstance.annotation.onDestroy;
 			while (deregisterers.length > 0) {
 				deregisterers.pop()();
@@ -166,8 +174,10 @@ module.exports = function(Chart) {
 
 },{}],4:[function(require,module,exports){
 module.exports = function(Chart) {
+	/* eslint-disable global-require */
 	var chartHelpers = Chart.helpers;
 	var helpers = require('./helpers.js')(Chart);
+	/* eslint-enable global-require */
 
 	function collapseHoverEvents(events) {
 		var hover = false;
@@ -260,7 +270,7 @@ module.exports = function(Chart) {
 
 		if (eventHandlers.length > 0) {
 			e.stopImmediatePropagation();
-			e.preventDefault();
+			// e.preventDefault();
 			eventHandlers.forEach(function(eventHandler) {
 				// [handler, event, element]
 				eventHandler[0].call(eventHandler[2], eventHandler[1]);
@@ -500,11 +510,13 @@ Chart.Annotation.labelDefaults = {
 
 Chart.Annotation.Element = require('./element.js')(Chart);
 
+/* eslint-disable global-require */
 Chart.Annotation.types = {
 	line: require('./types/line.js')(Chart),
 	box: require('./types/box.js')(Chart),
 	circle: require('./types/circle.js')(Chart)
 };
+/* eslint-enable global-require */
 
 var annotationPlugin = require('./annotation.js')(Chart);
 
@@ -514,7 +526,9 @@ Chart.pluginService.register(annotationPlugin);
 },{"./annotation.js":2,"./element.js":3,"./types/box.js":7,"./types/circle.js":8,"./types/line.js":9,"chart.js":1}],7:[function(require,module,exports){
 // Box Annotation implementation
 module.exports = function(Chart) {
+	/* eslint-disable global-require */
 	var helpers = require('../helpers.js')(Chart);
+	/* eslint-enable global-require */
 
 	var BoxAnnotation = Chart.Annotation.Element.extend({
 		setDataLimits: function() {
@@ -537,8 +551,8 @@ module.exports = function(Chart) {
 			var max = 0;
 
 			if (xScale) {
-				min = helpers.isValid(options.xMin) ? options.xMin : xScale.getPixelForValue(chartArea.left);
-				max = helpers.isValid(options.xMax) ? options.xMax : xScale.getPixelForValue(chartArea.right);
+				min = helpers.isValid(options.xMin) ? options.xMin : xScale.getValueForPixel(chartArea.left);
+				max = helpers.isValid(options.xMax) ? options.xMax : xScale.getValueForPixel(chartArea.right);
 
 				model.ranges[options.xScaleID] = {
 					min: Math.min(min, max),
@@ -547,8 +561,8 @@ module.exports = function(Chart) {
 			}
 
 			if (yScale) {
-				min = helpers.isValid(options.yMin) ? options.yMin : yScale.getPixelForValue(chartArea.bottom);
-				max = helpers.isValid(options.yMax) ? options.yMax : yScale.getPixelForValue(chartArea.top);
+				min = helpers.isValid(options.yMin) ? options.yMin : yScale.getValueForPixel(chartArea.bottom);
+				max = helpers.isValid(options.yMax) ? options.yMax : yScale.getValueForPixel(chartArea.top);
 
 				model.ranges[options.yScaleID] = {
 					min: Math.min(min, max),
@@ -743,8 +757,10 @@ module.exports = function(Chart) {
 },{"../helpers.js":5}],9:[function(require,module,exports){
 // Line Annotation implementation
 module.exports = function(Chart) {
+	/* eslint-disable global-require */
 	var chartHelpers = Chart.helpers;
 	var helpers = require('../helpers.js')(Chart);
+	/* eslint-enable global-require */
 
 	var horizontalKeyword = 'horizontal';
 	var verticalKeyword = 'vertical';
@@ -848,8 +864,8 @@ module.exports = function(Chart) {
 			var scale = chartInstance.scales[options.scaleID];
 			var pixel, endPixel;
 			if (scale) {
-				pixel = helpers.isValid(options.value) ? scale.getPixelForValue(options.value) : NaN;
-				endPixel = helpers.isValid(options.endValue) ? scale.getPixelForValue(options.endValue) : pixel;
+				pixel = helpers.isValid(options.value) ? scale.getPixelForValue(options.value, options.value.index) : NaN;
+				endPixel = helpers.isValid(options.endValue) ? scale.getPixelForValue(options.endValue, options.value.index) : pixel;
 			}
 
 			if (isNaN(pixel)) {
@@ -898,12 +914,25 @@ module.exports = function(Chart) {
 
 			ctx.font = chartHelpers.fontString(model.labelFontSize, model.labelFontStyle, model.labelFontFamily);
 			var textWidth = ctx.measureText(model.labelContent).width;
-			var textHeight = ctx.measureText('M').width;
+			var textHeight = model.labelFontSize;
+			model.labelHeight = textHeight + (2 * model.labelYPadding);
+
+			if (model.labelContent && chartHelpers.isArray(model.labelContent)) {
+				var labelContentArray = model.labelContent.slice(0);
+				var longestLabel = labelContentArray.sort(function(a, b) {
+					return b.length - a.length;
+				})[0];
+				textWidth = ctx.measureText(longestLabel).width;
+
+				model.labelHeight = (textHeight * model.labelContent.length) + (2 * model.labelYPadding);
+				// Add padding in between each label item
+				model.labelHeight += model.labelYPadding * (model.labelContent.length - 1);
+			}
+
 			var labelPosition = calculateLabelPosition(model, textWidth, textHeight, model.labelXPadding, model.labelYPadding);
 			model.labelX = labelPosition.x - model.labelXPadding;
 			model.labelY = labelPosition.y - model.labelYPadding;
 			model.labelWidth = textWidth + (2 * model.labelXPadding);
-			model.labelHeight = textHeight + (2 * model.labelYPadding);
 
 			model.borderColor = options.borderColor;
 			model.borderWidth = options.borderWidth;
@@ -996,12 +1025,27 @@ module.exports = function(Chart) {
 				);
 				ctx.fillStyle = view.labelFontColor;
 				ctx.textAlign = 'center';
-				ctx.textBaseline = 'middle';
-				ctx.fillText(
-					view.labelContent,
-					view.labelX + (view.labelWidth / 2),
-					view.labelY + (view.labelHeight / 2)
-				);
+
+				if (view.labelContent && chartHelpers.isArray(view.labelContent)) {
+					var textYPosition = view.labelY + view.labelYPadding;
+					for (var i = 0; i < view.labelContent.length; i++) {
+						ctx.textBaseline = 'top';
+						ctx.fillText(
+							view.labelContent[i],
+							view.labelX + (view.labelWidth / 2),
+							textYPosition
+						);
+
+						textYPosition += view.labelFontSize + view.labelYPadding;
+					}
+				} else {
+					ctx.textBaseline = 'middle';
+					ctx.fillText(
+						view.labelContent,
+						view.labelX + (view.labelWidth / 2),
+						view.labelY + (view.labelHeight / 2)
+					);
+				}
 			}
 
 			ctx.restore();
